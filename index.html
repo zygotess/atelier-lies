@@ -31,17 +31,7 @@
     }
     .workshop h3 { margin: 0 0 5px; }
     footer { text-align: center; padding: 30px; color: #888; font-size: 0.9em; }
-    button {
-      background: #8a9a5b; color: white; border: none; border-radius: 6px;
-      padding: 10px 18px; font-size: 1em; font-family: inherit; cursor: pointer;
-    }
-    button:hover { background: #75844b; }
-    #reviewForm { display: none; background: white; border-radius: 8px; padding: 15px 20px; margin: 15px 0; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-    .stars span { font-size: 2em; color: #ccc; cursor: pointer; }
-    .stars span.on { color: #e0a800; }
-    textarea { width: 100%; box-sizing: border-box; height: 80px; margin: 10px 0; font-family: inherit; font-size: 1em; padding: 8px; }
-    .review { border-left: 4px solid #e0a800; background: white; padding: 10px 15px; margin: 10px 0; border-radius: 4px; }
-    .review .score { color: #e0a800; font-size: 1.2em; }
+    .senja-block { margin: 20px 0; }
   </style>
 </head>
 <body>
@@ -69,72 +59,24 @@
     </div>
 
     <h2>Reviews</h2>
-    <button id="openReview">Schrijf een review</button>
-    <div id="reviewForm">
-      <div class="stars" id="stars">
-        <span data-value="1">★</span><span data-value="2">★</span><span data-value="3">★</span><span data-value="4">★</span><span data-value="5">★</span>
-      </div>
-      <textarea id="reviewText" placeholder="Hoe was je workshop?"></textarea>
-      <button id="submitReview">OK</button>
+    <!-- Weergave: Senja-widget (reviews staan op hun servers) -->
+    <div class="senja-block">
+      <script src="https://widget.senja.io/widget/76b3a7f7-7e40-40f9-b4a3-f6623e612c52/platform.js" type="text/javascript" async></script>
+      <div class="senja-embed" data-id="76b3a7f7-7e40-40f9-b4a3-f6623e612c52" data-mode="shadow" data-lazyload="false" style="display: block; width: 100%;"></div>
     </div>
-    <div id="reviews"></div>
+
+    <h2>Schrijf een review</h2>
+    <!-- Formulier: Senja-collector (opslag + spamfilter bij hen) -->
+    <div class="senja-block">
+      <script type="text/javascript" src="https://widget.senja.io/js/iframeResizer.min.js"></script>
+      <iframe id="senja-collector-iframe" src="https://senja.io/p/zygotess/r/UokHOE?mode=embed" allow="camera;microphone" title="Reviewformulier" frameborder="0" scrolling="auto" width="100%" height="700"></iframe>
+      <script type="text/javascript">iFrameResize({log: false, checkOrigin: false}, "#senja-collector-iframe");</script>
+    </div>
 
     <h2>Contact</h2>
     <p>Vragen of interesse? Stuur een mailtje naar <strong>lies@atelierlies.be</strong>.</p>
   </main>
 
   <footer>© 2026 Atelier Lies</footer>
-
-  <script>
-    // Reviews worden voorlopig enkel in deze browser bewaard (localStorage).
-    let chosenStars = 0;
-    const stars = document.querySelectorAll('#stars span');
-
-    function showStars(n) {
-      stars.forEach(s => s.classList.toggle('on', s.dataset.value <= n));
-    }
-
-    stars.forEach(s => {
-      s.addEventListener('mouseover', () => showStars(s.dataset.value));
-      s.addEventListener('mouseout', () => showStars(chosenStars));
-      s.addEventListener('click', () => { chosenStars = Number(s.dataset.value); showStars(chosenStars); });
-    });
-
-    document.getElementById('openReview').addEventListener('click', () => {
-      document.getElementById('reviewForm').style.display = 'block';
-    });
-
-    function loadReviews() { return JSON.parse(localStorage.getItem('reviews') || '[]'); }
-
-    function showReviews() {
-      const box = document.getElementById('reviews');
-      box.innerHTML = '';
-      loadReviews().forEach(r => {
-        const div = document.createElement('div');
-        div.className = 'review';
-        const score = document.createElement('div');
-        score.className = 'score';
-        score.textContent = '★'.repeat(r.stars) + '☆'.repeat(5 - r.stars);
-        const text = document.createElement('p');
-        text.textContent = r.text;   // textContent: geen HTML van bezoekers uitvoeren
-        div.append(score, text);
-        box.appendChild(div);
-      });
-    }
-
-    document.getElementById('submitReview').addEventListener('click', () => {
-      const text = document.getElementById('reviewText').value.trim();
-      if (chosenStars === 0) { alert('Kies eerst een aantal sterren.'); return; }
-      const all = loadReviews();
-      all.push({ stars: chosenStars, text: text });
-      localStorage.setItem('reviews', JSON.stringify(all));
-      document.getElementById('reviewText').value = '';
-      chosenStars = 0; showStars(0);
-      document.getElementById('reviewForm').style.display = 'none';
-      showReviews();
-    });
-
-    showReviews();
-  </script>
 </body>
 </html>
